@@ -19,8 +19,15 @@ export default defineNuxtConfig({
   nitro: {
     prerender: {
       crawlLinks: true,
-      routes: ['/sitemap.xml', '/robots.txt', '/about', '/', '/contact']
-    }
+      routes: ['/', '/about', '/contact'],
+    },
+    static: true
   },
   modules: ['nuxt-lucide-icons'],
+  experimental: {
+    payloadExtraction: false
+  },
+  build: {
+    transpile: ['gsap']
+  }
 })

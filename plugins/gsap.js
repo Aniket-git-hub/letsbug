@@ -3,9 +3,11 @@ import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 
 export default defineNuxtPlugin((nuxtApp) => {
-    // Register GSAP plugins if needed
-    gsap.registerPlugin(ScrollTrigger)
+    if (process.client) {
+        // Only register GSAP plugins on client-side
+        gsap.registerPlugin(ScrollTrigger)
+    }
 
-    // Make GSAP available globally
+    // Provide gsap instance
     nuxtApp.provide('gsap', gsap)
 })

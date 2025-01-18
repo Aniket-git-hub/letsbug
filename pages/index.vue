@@ -57,12 +57,17 @@ const mouseX = ref(0)
 const mouseY = ref(0)
 
 onMounted(() => {
-	// Initialize smooth scroll
-	initMouseFollower()
-	initSectionAnimations()
+	// Only run on client-side
+	if (process.client) {
+		// Initialize smooth scroll
+		initMouseFollower()
+		initSectionAnimations()
+	}
 })
 
 const initMouseFollower = () => {
+	if (!process.client) return
+
 	window.addEventListener("mousemove", (e) => {
 		mouseX.value = e.clientX
 		mouseY.value = e.clientY
@@ -82,6 +87,8 @@ const initMouseFollower = () => {
 }
 
 const initSectionAnimations = () => {
+	if (!process.client) return
+
 	// Animate sections on scroll
 	const sections = document.querySelectorAll("section")
 	sections.forEach((section) => {
