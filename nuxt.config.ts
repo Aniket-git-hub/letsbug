@@ -6,7 +6,6 @@ export default defineNuxtConfig({
       viewport: 'width=device-width, initial-scale=1',
     }
   },
-
   compatibilityDate: '2025-01-18',
   devtools: { enabled: true },
   css: ['@/assets/css/main.css'],
@@ -17,6 +16,11 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-
+  nitro: {
+    prerender: {
+      crawlLinks: true,
+      routes: ['/sitemap.xml', '/robots.txt', '/about', '/', '/contact']
+    }
+  },
   modules: ['nuxt-lucide-icons'],
 })
