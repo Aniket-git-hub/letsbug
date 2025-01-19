@@ -119,7 +119,7 @@ const initSectionAnimations = () => {
 		<section class="section"><Problems /></section>
 		<section class="section"><ProbNew /></section>
 		<section class="section"><Solutions /></section>
-		<section class="section overflow-x-hidden"><Collaboration /></section>
+		<section class="section"><Collaboration /></section>
 		<section class="section"><Results /></section>
 		<section class="section"><Contact /></section>
 		<section class="section"><Footer /></section>

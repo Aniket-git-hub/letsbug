@@ -196,6 +196,50 @@
 									class="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
 								></div>
 							</button>
+
+							<!-- Notification -->
+							<Transition
+								enter-active-class="transition duration-300 ease-out"
+								enter-from-class="transform -translate-y-2 opacity-0"
+								enter-to-class="transform translate-y-0 opacity-100"
+								leave-active-class="transition duration-200 ease-in"
+								leave-from-class="transform translate-y-0 opacity-100"
+								leave-to-class="transform -translate-y-2 opacity-0"
+							>
+								<div
+									v-if="notification.show"
+									:class="{
+										'bg-green-50 text-green-800 dark:bg-green-900/50 dark:text-green-300':
+											notification.type === 'success',
+										'bg-red-50 text-red-800 dark:bg-red-900/50 dark:text-red-300':
+											notification.type === 'error',
+									}"
+									class="rounded-lg p-4 mt-6"
+								>
+									<div class="flex">
+										<div class="flex-shrink-0">
+											<CheckCircle
+												v-if="
+													notification.type ===
+													'success'
+												"
+												class="h-5 w-5 text-green-400"
+												aria-hidden="true"
+											/>
+											<XCircle
+												v-else
+												class="h-5 w-5 text-red-400"
+												aria-hidden="true"
+											/>
+										</div>
+										<div class="ml-3">
+											<p class="text-sm font-medium">
+												{{ notification.message }}
+											</p>
+										</div>
+									</div>
+								</div>
+							</Transition>
 						</form>
 					</div>
 				</div>
@@ -261,14 +305,80 @@
 <script setup>
 import { useNuxtApp } from "#app"
 import {
+	CheckCircle,
 	Clock,
 	Mail,
 	MapPin,
 	MessageSquare,
 	Phone,
 	User,
+	XCircle,
 } from "lucide-vue-next"
 import { onBeforeUnmount, onMounted, ref } from "vue"
+
+// SEO Configuration
+useHead({
+	title: "Contact Letsbug - Get in Touch | Professional Web Development Agency",
+	meta: [
+		{
+			name: "description",
+			content:
+				"Contact Letsbug for professional web development services. Whether you need a new website, digital transformation, or technical consultation, our team is ready to help.",
+		},
+		{
+			name: "keywords",
+			content:
+				"contact Letsbug, web development contact, hire web developers, digital agency contact, Aniket Singh contact, web development consultation, website project inquiry",
+		},
+		{
+			property: "og:title",
+			content:
+				"Contact Letsbug - Get in Touch | Professional Web Development Agency",
+		},
+		{
+			property: "og:description",
+			content:
+				"Ready to transform your digital presence? Contact Letsbug today for professional web development services and expert consultation.",
+		},
+		{ property: "og:type", content: "website" },
+		{ property: "og:locale", content: "en_US" },
+		{ name: "twitter:card", content: "summary_large_image" },
+		{
+			name: "twitter:title",
+			content: "Contact Letsbug - Get in Touch",
+		},
+		{
+			name: "twitter:description",
+			content:
+				"Ready to transform your digital presence? Contact Letsbug today for professional web development services and expert consultation.",
+		},
+		{ name: "robots", content: "index, follow" },
+	],
+	link: [{ rel: "canonical", href: "https://letsbug.in/contact" }],
+	script: [
+		{
+			type: "application/ld+json",
+			children: JSON.stringify({
+				"@context": "https://schema.org",
+				"@type": "ContactPage",
+				name: "Contact Letsbug",
+				description: "Contact page for Letsbug web development agency",
+				url: "https://letsbug.in/contact",
+				mainEntity: {
+					"@type": "Organization",
+					name: "Letsbug",
+					contactPoint: {
+						"@type": "ContactPoint",
+						telephone: "+1 (123) 456-7890",
+						email: "hello@letsbug.com",
+						contactType: "customer service",
+						availableLanguage: "English",
+					},
+				},
+			}),
+		},
+	],
+})
 
 // Cursor refs
 const cursor = ref(null)
@@ -287,6 +397,7 @@ const formData = ref({
 const errors = ref({})
 const formFocus = ref(null)
 const isSubmitting = ref(false)
+const notification = ref({ show: false, message: "", type: "success" })
 
 // Animation refs
 const heroSection = ref(null)
@@ -391,24 +502,65 @@ const handleBlur = () => {
 	formFocus.value = null
 }
 
+const createEmailTemplate = (data) => {
+	return `
+Name: ${data.name}
+Email: ${data.email}
+Phone: ${data.phone || "Not provided"}
+Message: ${data.message}
+	`.trim()
+}
+
 const handleSubmit = async () => {
 	errors.value = {}
+	notification.value.show = false
 	if (!formData.value.name) errors.value.name = "Name is required"
 	if (!formData.value.email) errors.value.email = "Email is required"
 	if (!formData.value.message) errors.value.message = "Message is required"
 
 	if (Object.keys(errors.value).length === 0) {
 		isSubmitting.value = true
-		// Simulate API call
-		await new Promise((resolve) => setTimeout(resolve, 2000))
-		console.log("Form submitted:", formData.value)
-		isSubmitting.value = false
-		// Reset form
-		formData.value = {
-			name: "",
-			email: "",
-			phone: "",
-			message: "",
+		try {
+			const template = createEmailTemplate(formData.value)
+			const response = await fetch(
+				"https://emailer-esi7.onrender.com/send-email",
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						to: "singhdharmvir81@gmail.com",
+						subject: "New feedback from " + formData.value.name,
+						text: template,
+					}),
+				},
+			)
+
+			if (!response.ok) {
+				throw new Error("Failed to send email")
+			}
+
+			// Reset form and show success message
+			formData.value = {
+				name: "",
+				email: "",
+				phone: "",
+				message: "",
+			}
+			notification.value = {
+				show: true,
+				message:
+					"Your message has been sent successfully! We will get back to you soon.",
+				type: "success",
+			}
+		} catch (error) {
+			console.error("Error sending email:", error)
+			notification.value = {
+				show: true,
+				message: "Failed to send message. Please try again.",
+				type: "error",
+			}
+		} finally {
+			isSubmitting.value = false
 		}
 	}
 }

@@ -78,11 +78,13 @@
 					</div>
 					<div class="relative">
 						<div class="aspect-square rounded-2xl overflow-hidden">
-							<!-- Replace with your image -->
 							<img
 								src="https://avatars.githubusercontent.com/u/101374411?v=4"
-								alt="Our Journey"
+								alt="Letsbug Founder Aniket Singh - Leading Web Development Innovation"
 								class="w-full h-full object-cover"
+								loading="eager"
+								width="400"
+								height="400"
 							/>
 						</div>
 					</div>
@@ -153,8 +155,16 @@
 							>
 								<img
 									:src="member.image"
-									:alt="member.name"
+									:alt="
+										member.name +
+										' - ' +
+										member.role +
+										' at Letsbug'
+									"
 									class="w-full h-full object-cover"
+									loading="lazy"
+									width="128"
+									height="128"
 								/>
 							</div>
 						</div>
@@ -253,6 +263,79 @@ const teamMembers = [
 		image: "https://avatars.githubusercontent.com/u/101374411?v=4",
 	},
 ]
+
+// SEO Configuration
+useHead({
+	title: "About Letsbug - Our Story, Values & Team | Professional Web Development Agency",
+	meta: [
+		{
+			name: "description",
+			content:
+				"Learn about Letsbug's journey, core values, and the passionate team behind our web development agency. Discover how we transform businesses through digital innovation.",
+		},
+		{
+			name: "keywords",
+			content:
+				"Letsbug about, web development team, digital agency values, Aniket Singh, tech company culture, professional web developers, digital transformation experts",
+		},
+		{
+			property: "og:title",
+			content:
+				"About Letsbug - Our Story, Values & Team | Professional Web Development Agency",
+		},
+		{
+			property: "og:description",
+			content:
+				"Meet the team behind Letsbug and discover how we're revolutionizing digital solutions through innovation, partnership, and transparency.",
+		},
+		{ property: "og:type", content: "website" },
+		{ property: "og:locale", content: "en_US" },
+		{ name: "twitter:card", content: "summary_large_image" },
+		{
+			name: "twitter:title",
+			content: "About Letsbug - Our Story, Values & Team",
+		},
+		{
+			name: "twitter:description",
+			content:
+				"Meet the team behind Letsbug and discover how we're revolutionizing digital solutions through innovation, partnership, and transparency.",
+		},
+		{ name: "robots", content: "index, follow" },
+	],
+	link: [{ rel: "canonical", href: "https://letsbug.in/about" }],
+	script: [
+		{
+			type: "application/ld+json",
+			children: JSON.stringify({
+				"@context": "https://schema.org",
+				"@type": "Organization",
+				name: "Letsbug",
+				url: "https://letsbug.in",
+				logo: "https://avatars.githubusercontent.com/u/101374411?v=4",
+				description:
+					"Founded with a vision to bridge the gap between technology and business growth, Letsbug has been helping organizations of all sizes establish a robust online presence.",
+				founder: {
+					"@type": "Person",
+					name: "Aniket Singh",
+					jobTitle: "Founder",
+					image: "https://avatars.githubusercontent.com/u/101374411?v=4",
+				},
+				employees: teamMembers.map((member) => ({
+					"@type": "Person",
+					name: member.name,
+					jobTitle: member.role,
+					image: member.image,
+				})),
+				sameAs: [
+					"https://github.com/Aniket-git-hub",
+					"https://x.com/singhaniket06",
+					"https://www.linkedin.com/in/aniket-singh-80371b201",
+					"https://www.instagram.com/aniketsingh6967/",
+				],
+			}),
+		},
+	],
+})
 
 // Mouse position for gravity effect
 const mousePos = ref({ x: 0, y: 0 })

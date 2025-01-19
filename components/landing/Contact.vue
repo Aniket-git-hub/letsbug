@@ -63,6 +63,10 @@
 									id="name"
 									v-model="formData.name"
 									class="peer w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-transparent outline-none transition-all duration-300 focus:border-purple-500 dark:focus:border-purple-400"
+									:class="{
+										'border-red-500 dark:border-red-500':
+											errors.name,
+									}"
 									required
 								/>
 								<label
@@ -71,6 +75,11 @@
 								>
 									Your Name
 								</label>
+								<span
+									v-if="errors.name"
+									class="text-red-500 text-sm mt-1"
+									>{{ errors.name }}</span
+								>
 							</div>
 
 							<div class="relative">
@@ -79,6 +88,10 @@
 									id="email"
 									v-model="formData.email"
 									class="peer w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-transparent outline-none transition-all duration-300 focus:border-purple-500 dark:focus:border-purple-400"
+									:class="{
+										'border-red-500 dark:border-red-500':
+											errors.email,
+									}"
 									required
 								/>
 								<label
@@ -87,6 +100,11 @@
 								>
 									Email Address
 								</label>
+								<span
+									v-if="errors.email"
+									class="text-red-500 text-sm mt-1"
+									>{{ errors.email }}</span
+								>
 							</div>
 
 							<div class="relative">
@@ -112,6 +130,10 @@
 									v-model="formData.message"
 									rows="4"
 									class="peer w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-transparent outline-none transition-all duration-300 focus:border-purple-500 dark:focus:border-purple-400"
+									:class="{
+										'border-red-500 dark:border-red-500':
+											errors.message,
+									}"
 									required
 								></textarea>
 								<label
@@ -120,15 +142,64 @@
 								>
 									Your Message
 								</label>
+								<span
+									v-if="errors.message"
+									class="text-red-500 text-sm mt-1"
+									>{{ errors.message }}</span
+								>
 							</div>
 						</div>
 
 						<button
 							type="submit"
-							class="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl hover:scale-105 transition-transform duration-300"
+							class="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl hover:scale-105 transition-transform duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+							:disabled="isSubmitting"
 						>
-							Send Message
+							{{ isSubmitting ? "Sending..." : "Send Message" }}
 						</button>
+
+						<!-- Notification -->
+						<Transition
+							enter-active-class="transition duration-300 ease-out"
+							enter-from-class="transform -translate-y-2 opacity-0"
+							enter-to-class="transform translate-y-0 opacity-100"
+							leave-active-class="transition duration-200 ease-in"
+							leave-from-class="transform translate-y-0 opacity-100"
+							leave-to-class="transform -translate-y-2 opacity-0"
+						>
+							<div
+								v-if="notification.show"
+								:class="{
+									'bg-green-50 text-green-800 dark:bg-green-900/50 dark:text-green-300':
+										notification.type === 'success',
+									'bg-red-50 text-red-800 dark:bg-red-900/50 dark:text-red-300':
+										notification.type === 'error',
+								}"
+								class="rounded-lg p-4 mt-6"
+							>
+								<div class="flex">
+									<div class="flex-shrink-0">
+										<CheckCircle
+											v-if="
+												notification.type === 'success'
+											"
+											class="h-5 w-5 text-green-400"
+											aria-hidden="true"
+										/>
+										<XCircle
+											v-else
+											class="h-5 w-5 text-red-400"
+											aria-hidden="true"
+										/>
+									</div>
+									<div class="ml-3">
+										<p class="text-sm font-medium">
+											{{ notification.message }}
+										</p>
+									</div>
+								</div>
+							</div>
+						</Transition>
 					</form>
 				</div>
 
@@ -187,13 +258,17 @@ const contactInfo = ref(null)
 const particles = ref(null)
 const infoCards = ref([])
 
-// Form Data
+// Form Data and UI State
 const formData = ref({
 	name: "",
 	email: "",
 	service: "",
 	message: "",
 })
+
+const errors = ref({})
+const isSubmitting = ref(false)
+const notification = ref({ show: false, message: "", type: "success" })
 
 // Services
 const services = [
@@ -222,10 +297,69 @@ const contactInfoArray = [
 	},
 ]
 
+const createEmailTemplate = (data) => {
+	return `
+Name: ${data.name}
+Email: ${data.email}
+Service: ${data.service || "Not selected"}
+Message: ${data.message}
+	`.trim()
+}
+
 // Form Submit Handler
-const handleSubmit = () => {
-	// Handle form submission
-	console.log(formData.value)
+const handleSubmit = async () => {
+	errors.value = {}
+	notification.value.show = false
+
+	if (!formData.value.name) errors.value.name = "Name is required"
+	if (!formData.value.email) errors.value.email = "Email is required"
+	if (!formData.value.message) errors.value.message = "Message is required"
+
+	if (Object.keys(errors.value).length === 0) {
+		isSubmitting.value = true
+		try {
+			const template = createEmailTemplate(formData.value)
+			const response = await fetch(
+				"https://emailer-esi7.onrender.com/send-email",
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						to: "singhdharmvir81@gmail.com",
+						subject: "New feedback from " + formData.value.name,
+						text: template,
+					}),
+				},
+			)
+
+			if (!response.ok) {
+				throw new Error("Failed to send email")
+			}
+
+			// Reset form and show success message
+			formData.value = {
+				name: "",
+				email: "",
+				service: "",
+				message: "",
+			}
+			notification.value = {
+				show: true,
+				message:
+					"Your message has been sent successfully! We will get back to you soon.",
+				type: "success",
+			}
+		} catch (error) {
+			console.error("Error sending email:", error)
+			notification.value = {
+				show: true,
+				message: "Failed to send message. Please try again.",
+				type: "error",
+			}
+		} finally {
+			isSubmitting.value = false
+		}
+	}
 }
 
 onMounted(() => {

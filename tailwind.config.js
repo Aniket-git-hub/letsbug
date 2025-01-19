@@ -11,6 +11,11 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        heading: ['Plus Jakarta Sans', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+      },
+
       transitionTimingFunction: {
         'gsap-ease': 'cubic-bezier(0.25, 1, 0.5, 1)', // Mimic GSAP's easing
       },

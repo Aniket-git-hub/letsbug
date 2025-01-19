@@ -104,7 +104,8 @@
 					class="opacity-0 flex flex-col sm:flex-row gap-4 justify-center"
 				>
 					<!-- Primary CTA -->
-					<button
+					<a
+						href="mailto:singhdharmvir81@gmail.com"
 						class="group relative px-8 py-4 bg-purple-600 dark:bg-purple-500 text-white rounded-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 overflow-hidden"
 					>
 						<span class="relative z-10">Let's Build Together</span>
@@ -120,10 +121,11 @@
 								class="absolute inset-0 animate-sparkle-2"
 							></div>
 						</div>
-					</button>
+					</a>
 
 					<!-- Secondary CTA -->
-					<button
+					<NuxtLink
+						to="/about"
 						class="group px-8 py-4 border-2 border-purple-600 dark:border-purple-400 text-purple-600 dark:text-purple-400 rounded-xl transition-all duration-300 hover:bg-purple-50 dark:hover:bg-purple-900/30 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
 					>
 						<span
@@ -135,7 +137,7 @@
 								>→</span
 							>
 						</span>
-					</button>
+					</NuxtLink>
 				</div>
 
 				<!-- Tech Stack Icons -->
