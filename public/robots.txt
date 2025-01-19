@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://letsbug.dev/sitemap.xml
+Sitemap: https://letsbug.in/sitemap.xml
